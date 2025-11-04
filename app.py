@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, redirect, url_for, g, jsonify
 
 app = Flask(__name__)
 
-# Database connection pool
+
 pool = None
 
 def get_pool():
