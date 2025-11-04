@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shishir Shetty | Flask App 🚀</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+        :root {
+            --bg-gradient-start: #111827;
+            --bg-gradient-end: #1F2937;
+            --card-bg: #374151;
+            --accent-color: #34D399;
+            --accent-hover: #10B981;
+            --text-primary: #F9FAFB;
+            --text-secondary: #D1D5DB;
+            --danger-color: #F87171;
+            --danger-hover: #EF4444;
+            --shadow-color: rgba(52, 211, 153, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(160deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .about {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: 12px;
+            background: var(--card-bg);
+        }
+
+        .about h2 {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+
+        .about p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .messages {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            max-height: 250px;
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        .messages p {
+            padding: 10px;
+            background: rgba(17, 24, 39, 0.8);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 1rem;
+            border-left: 3px solid var(--accent-color);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid var(--card-bg);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 12px var(--shadow-color);
+            outline: none;
+        }
+
+        .form-actions {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        input[type="submit"], .clear-button {
+            padding: 15px;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        input[type="submit"] {
+            background: var(--accent-color);
+        }
+
+        input[type="submit"]:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 0 15px var(--shadow-color);
+            transform: translateY(-2px);
+        }
+
+        .clear-button {
+            background: var(--danger-color);
+        }
+
+        .clear-button:hover {
+            background: var(--danger-hover);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+            transform: translateY(-2px);
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="content">
+            <div class="header">
+                <h1>Shishir Shetty</h1>
+                <p>Aspiring Cloud & DevOps Engineer</p>
+            </div>
+
+            <div class="about">
+                <h2>About This Project</h2>
+                <p>
+                    This is a two-tier web application built with a <b>Flask</b> backend and a <b>PostgreSQL</b> database. The entire application is containerized using <b>Docker</b> and orchestrated with <b>Docker Compose</b>. The backend is served by a production-ready <b>Gunicorn</b> WSGI server, and database connections are managed efficiently using a connection pool.
+                </p>
+            </div>
+
+            <div class="messages">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+
+            <form id="messageForm" action="/submit" method="post">
+                <input type="text" name="new_message" placeholder="Type your message..." required>
+                <div class="form-actions">
+                    <input type="submit" value="Send Message">
+                    <button type="button" class="clear-button" onclick="confirmClear()">Clear All</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Message submission via AJAX
+            $("#messageForm").on("submit", function(event) {
+                event.preventDefault();
+                let messageInput = $("input[name='new_message']");
+                let message = messageInput.val().trim();
+
+                if (message === "") {
+                    alert("Message cannot be empty!");
+                    return;
+                }
+
+                $.ajax({
+                    url: "/submit",
+                    type: "POST",
+                    data: { new_message: message },
+                    success: function(response) {
+                        if (response && response.message) {
+                            $(".messages").prepend("<p>" + response.message + "</p>");
+                            messageInput.val("");
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", status, error);
+                        alert("Error submitting message.");
+                    }
+                });
+            });
+
+            // Clear all messages via AJAX
+            window.confirmClear = function() {
+                if (confirm("Are you sure you want to clear all messages? This action cannot be undone.")) {
+                    $.ajax({
+                        url: "/clear",
+                        type: "POST",
+                        success: function(response) {
+                            if (response && response.status === 'success') {
+                                $(".messages").empty();
+                                alert("All messages cleared!");
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("AJAX Error:", status, error);
+                            alert("Error clearing messages.");
+                        }
+                    });
+                }
+            };
+        });
+    </script>
+</body>
+</html>
