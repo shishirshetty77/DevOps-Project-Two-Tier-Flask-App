@@ -65,20 +65,15 @@ pipeline {
     }
 
     post {
-        always {
-            echo 'Cleaning up environment...'
-            sh '''
-                docker compose down || true
-                docker system prune -af || true
-            '''
-        }
-
         success {
-            echo ' Pipeline executed successfully!'
+            echo 'Pipeline executed successfully! Containers are running.'
         }
 
         failure {
-            echo ' Pipeline failed. Please check the logs for details.'
+            echo 'Pipeline failed. Please check the logs for details.'
+            sh '''
+                docker compose down || true
+            '''
         }
     }
 }
